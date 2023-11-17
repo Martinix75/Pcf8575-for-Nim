@@ -90,33 +90,4 @@ proc setHigh*(self: Pcf8575) =
 proc newExpander16*(blokk: I2cInst; expAddr: uint8 = 0x20): Pcf8575 =
   result = Pcf8575(blokk: blokk, expAddr: expAddr)
 
-when isMainModule:
-  stdioInitAll()
-  sleep(1500)
-  print("Partenza....")
-  let expander = newExpander16(blokk = i2c1, expAddr = 0x20)
-  const 
-    sda = 2.Gpio
-    scl = 3.Gpio
-  init(i2c1,50_000)
-  sda.setFunction(I2C); sda.disablePulls()
-  scl.setFunction(I2C); scl.disablePulls()
-  while true:
-    #[print("Spengo tutto...")
-    expander.setLow()
-    sleep(2000)
-    print("Accendo led p2 & p1..")
-    expander.writeBytes(0x0006) #1 byte ttto 1
-    sleep(2500)
-    print("Accendo Led (p2 & p1) + p0")
-    expander.writeBit(p0, on)
-    sleep(2500)
-    print("Spengo P2...")
-    expander.writeBit(p2, off)
-    sleep(2000)]#
-    print("-------------")
-    print("Ora provo a leggere il bit 0......")
-    let lettura = expander.readBit(p0)
-    print("Ho letto: " & $lettura)
-    sleep(2000)
 
