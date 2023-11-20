@@ -12,7 +12,7 @@ import picostdlib/[stdio, gpio, time, i2c]
 from math import log2
 
 const 
-  pcf8575Ver* = "1.0.0" # ripreso dal pfc8574 ad 8 bit.
+  pcf8575Ver* = "1.0.1" # ripreso dal pfc8574 ad 8 bit.
   p0*: uint16 = 0x0001
   p1*: uint16 = p0 shl 1
   p2*: uint16 = p0 shl 2
@@ -44,9 +44,9 @@ proc makeBuffer(self:Pcf8575) =
   self.buffer[1] = byteHigh #write high byte in second position.
 
 proc makeData(self: Pcf8575) =
-  self.data = self.buffer[1] shl 8 #byte alto si spostadi 8 bit in avti.
+  self.data = uint16(self.buffer[1]) shl 8 #byte alto si spostadi 8 bit in avti.
   self.data = self.data or self.buffer[0] #byte basso nei primi 8 bit.
-  
+
 proc writeBytes*(self: Pcf8575; data: uint16; inverse: bool = true) =
   if inverse == true: #invereti perche è opencolector ed i numeri  (0=1, e 1=0)
     self.data = not data
@@ -58,7 +58,6 @@ proc writeBytes*(self: Pcf8575; data: uint16; inverse: bool = true) =
   
 proc writeBit*(self: Pcf8575; pin: uint16; value: bool) =
   if value == on:
-    print("PIN: " & $pin)
     self.data = not self.data or pin #data è stata invertita tocca reivertire ogni volta!
     self.writeBytes(data = self.data)
   elif value == off:
