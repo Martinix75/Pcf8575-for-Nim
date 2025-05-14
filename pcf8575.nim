@@ -90,7 +90,8 @@ proc setHigh*(self: var Pcf8575) =
 
 proc initExpander16*(blokk: ptr I2cInst; expAddr: uint8 = 0x20): Pcf8575 =
   result = Pcf8575(blokk: blokk, expAddr: expAddr)
-
+  # da valutare se inizializzare i pin i2c qui.. ma forse no meglio indipendente
+  
 when isMainModule:
   stdioInitAll()
   sleepMs(1500)
@@ -102,7 +103,17 @@ when isMainModule:
   discard init(i2c1,50_000)
   sda.setFunction(I2C); sda.disablePulls()
   scl.setFunction(I2C); scl.disablePulls()
+  let timeSl: uint32 = 200
+  var supercar: uint16 = 0x01
   while true:
+    for _ in countUp(0, 14):
+      expander.writeBytes(supercar)
+      supercar = supercar shl 1
+      sleepMs(timeSl)
+    for _ in countUp(0, 14):
+      expander.writeBytes(supercar)
+      supercar = supercar shr 1
+      sleepMs(timeSl)
     #[print("Spengo tutto...")
     expander.setLow()
     sleep(2000)
@@ -114,10 +125,10 @@ when isMainModule:
     sleep(2500)
     print("Spengo P2...")
     expander.writeBit(p2, off)
-    sleep(2000)]#
+    sleep(2000)
     print("-------------")
     print("Ora provo a leggere il bit 0......")
     let lettura = expander.readBit(p0)
     print("Ho letto: " & $lettura)
-    sleepMs(2000)
+    sleepMs(2000) ]#
 
